@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SMS Smart Ground | Admin Operations & Signal Dashboard</title>
+  
+  <!-- Google Fonts & Material Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css" />
+  
+  <style>
+    .admin-tab-content { display: none; }
+    .admin-tab-content.active { display: block; animation: slide-toast 0.25s ease; }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-online { background: rgba(16, 185, 129, 0.15); color: var(--primary); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-busy { background: rgba(245, 158, 11, 0.15); color: var(--accent); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .status-offline { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Admin PIN Lock Overlay */
+    .admin-lock-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.15) 0%, rgba(10, 15, 29, 0.98) 70%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    .admin-lock-screen.unlocked {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .pin-input-field {
+      letter-spacing: 0.5em;
+      font-size: 1.8rem;
+      font-weight: 900;
+      text-align: center;
+      max-width: 240px;
+      margin: 0 auto;
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--primary);
+      padding: 0.75rem 1rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .pin-input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+    .shake-anim {
+      animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+      40%, 60% { transform: translate3d(6px, 0, 0); }
+    }
+  </style>
+</head>
+<body style="background: var(--bg-main);">
+
+  <!-- ==========================================
+       ADMIN PASSCODE LOCK SCREEN
+       ========================================== -->
+  <div class="admin-lock-screen" id="adminLockScreen">
+    <div class="glass-panel" id="lockCard" style="max-width: 440px; width: 100%; padding: 2.75rem 2rem; text-align: center; border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+      <div class="logo-icon-box" style="margin: 0 auto 1.25rem; width: 56px; height: 56px;">
+        <span class="material-icons text-2xl">lock</span>
+      </div>
+
+      <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.4rem;">Private Admin Console</h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 2rem;">
+        This portal is restricted to authorized ground operators. Please enter the master passcode to unlock.
+      </p>
+
+      <form id="adminLoginForm">
+        <div style="margin-bottom: 1.25rem;">
+          <input 
+            type="password" 
+            id="adminPinInput" 
+            class="pin-input-field" 
+            maxlength="6" 
+            placeholder="••••••" 
+            autocomplete="off"
+            autofocus 
+          />
+        </div>
+
+        <div id="pinErrorMsg" style="color: var(--danger); font-size: 0.82rem; font-weight: 700; min-height: 22px; margin-bottom: 1rem;"></div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem; margin-bottom: 1rem;">
+          <span class="material-icons text-sm">vpn_key</span> Unlock Admin Dashboard
+        </button>
+      </form>
+
+      <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 0.75rem; display: flex; justify-content: space-between; font-size: 0.82rem;">
+        <a href="index.html" class="footer-link" style="color: var(--text-muted);">
+          <span class="material-icons text-xs" style="vertical-align: middle;">arrow_back</span> Return to Website
+        </a>
+        <span style="color: var(--text-dim);">Restricted Access</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       Main Admin Portal Layout
+       ========================================== -->
+  <div class="admin-layout" id="adminMainLayout">
+    <!-- Admin Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div>
+        <a href="index.html" class="brand-logo" style="margin-bottom: 2rem;">
+          <div class="logo-icon-box">
+            <span class="material-icons">admin_panel_settings</span>
+          </div>
+          <div class="brand-title">
+            SMART <span>ADMIN</span>
+          </div>
+        </a>
+
+        <div style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.75rem; padding-left: 0.5rem;">
+          Control Center
+        </div>
+
+        <nav style="display: flex; flex-direction: column; gap: 0.35rem;">
+          <button class="admin-nav-item active" onclick="switchAdminTab('signalsTab', this)">
+            <span class="material-icons text-primary">sensors</span>
+            <span>Signals & Analytics</span>
+          </button>
+          <button class="admin-nav-item" onclick="switchAdminTab('groundsCmsTab', this)">
+            <span class="material-icons text-secondary">stadium</span>
+            <span>Grounds & Rates (CMS)</span>
+          </button>
+          <button class="admin-nav-item" onclick="switchAdminTab('membershipsCmsTab', this)">
+            <span class="material-icons text-primary">card_membership</span>
+            <span>Memberships (CMS)</span>
+          </button>
+          <button class="admin-nav-item" onclick="switchAdminTab('contentCmsTab', this)">
+            <span class="material-icons text-accent">campaign</span>
+            <span>Announcements & Alerts</span>
+          </button>
+          <button class="admin-nav-item" onclick="switchAdminTab('usersTab', this)">
+            <span class="material-icons" style="color: var(--secondary);">people</span>
+            <span>Registered Accounts</span>
+          </button>
+          <button class="admin-nav-item" onclick="switchAdminTab('bookingsTab', this)">
+            <span class="material-icons" style="color: var(--info);">confirmation_number</span>
+            <span>Bookings Manager</span>
+          </button>
+        </nav>
+      </div>
+
+      <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+        <a href="index.html" class="btn btn-outline-primary" style="font-size: 0.85rem; padding: 0.6rem 1rem;">
+          <span class="material-icons text-sm">visibility</span> View Live Website
+        </a>
+        <button class="btn btn-secondary" onclick="toggleTheme()" style="font-size: 0.85rem; padding: 0.6rem 1rem;">
+          <span class="material-icons text-sm" id="themeIcon">light_mode</span> Switch Theme
+        </button>
+        <button class="btn btn-secondary" onclick="lockAdminConsole()" style="font-size: 0.85rem; padding: 0.6rem 1rem; color: var(--danger); border-color: rgba(239,68,68,0.3);">
+          <span class="material-icons text-sm">lock</span> Lock Console
+        </button>
+      </div>
+    </aside>
+
+    <!-- Admin Main Content Area -->
+    <main class="admin-main-view">
+      <!-- Top Bar -->
+      <div class="admin-header-row">
+        <div>
+          <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--text-main);">Operations & Facility Intelligence</h1>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Real-time IoT sensors, visitor traffic analytics, and instant content management.</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="status-pill status-online">
+            <span class="radar-live-ring"></span>
+            <span>Sensors Live (5/5)</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.6rem; background: var(--bg-card); padding: 0.4rem 0.8rem; border-radius: var(--radius-full); border: 1px solid var(--border-color);">
+            <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=120&q=80" class="user-avatar-img" alt="Admin Avatar" />
+            <div style="font-size: 0.82rem; font-weight: 700;">Marcus Cole (Admin)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 1: Signals & Real-Time Analytics
+           ========================================== -->
+      <section id="signalsTab" class="admin-tab-content active">
+        <!-- Metric Cards -->
+        <div class="signals-grid">
+          <!-- Total Visitors -->
+          <div class="signal-card">
+            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Total Website Visitors</div>
+            <div class="signal-val-lg" id="adminTotalVisitors">12,482</div>
+            <div class="sensor-gauge-wrap">
+              <span class="material-icons text-primary text-sm">trending_up</span>
+              <span>+18.4% this week (Live Tracker)</span>
+            </div>
+          </div>
+
+          <!-- Concurrent Active Users -->
+          <div class="signal-card signal-cyan">
+            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Live Online Athletes</div>
+            <div class="signal-val-lg" style="color: var(--secondary);" id="adminLiveUsers">24 Users</div>
+            <div class="sensor-gauge-wrap">
+              <span class="radar-live-ring" style="background: var(--secondary);"></span>
+              <span>Browsing available evening slots</span>
+            </div>
+          </div>
+
+          <!-- Total Revenue Today -->
+          <div class="signal-card signal-amber">
+            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Today's Revenue</div>
+            <div class="signal-val-lg" style="color: var(--accent);" id="adminTodayRevenue">₹18,450</div>
+            <div class="sensor-gauge-wrap">
+              <span class="material-icons text-sm" style="color: var(--accent);">payments</span>
+              <span>12 Slot Reservations Paid</span>
+            </div>
+          </div>
+
+          <!-- Slot Occupancy -->
+          <div class="signal-card signal-blue">
+            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Night Occupancy Rate</div>
+            <div class="signal-val-lg" style="color: var(--info);">88%</div>
+            <div class="sensor-gauge-wrap">
+              <span class="material-icons text-sm" style="color: var(--info);">bolt</span>
+              <span>Peak Hours: 7 PM - 11 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- IoT Sensor Signals & Ground Monitoring -->
+        <div style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-icons text-primary">sensors</span> Arena Hardware & Turf IoT Telemetry
+          </h2>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+            <!-- Pitch 1 Signals -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 700;">Pitch 1 (Football Turf 7v7)</h3>
+                <span class="status-pill status-online">Operational</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Floodlight Illuminance:</span>
+                  <strong style="color: var(--primary);">1,020 Lux (Active 100%)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Soil & Turf Moisture:</span>
+                  <strong>38% (Optimal Resilience)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Surface Temperature:</span>
+                  <strong>22.5°C</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">AI Action Replay Cameras:</span>
+                  <strong style="color: var(--secondary);">4K 60FPS Streaming</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pitch 2 Signals -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 700;">Thunder Box Cricket Pitch</h3>
+                <span class="status-pill status-busy">Match In Play</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Floodlight Illuminance:</span>
+                  <strong style="color: var(--primary);">880 Lux (Active)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Netting Structural Tension:</span>
+                  <strong>98% (Secure)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Stump Sensors & Bails:</span>
+                  <strong style="color: var(--primary);">Wireless LED Connected</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Current Match:</span>
+                  <strong>FC Strikers vs Knight Riders</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tennis & Basketball Signals -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 700;">Indoor Arena (Basketball/Badminton)</h3>
+                <span class="status-pill status-online">Optimal Climate</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">HVAC Air Conditioning:</span>
+                  <strong style="color: var(--secondary);">21°C / 45% Humidity</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Maple Floor Shock Buffer:</span>
+                  <strong>99.2% Calibrated</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Electronic Scoreboard:</span>
+                  <strong style="color: var(--primary);">Connected</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Next Reserved Slot:</span>
+                  <strong>07:00 PM (Badminton League)</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: Grounds & Arenas Editor (CMS)
+           ========================================== -->
+      <section id="groundsCmsTab" class="admin-tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800;">Edit Arenas, Pricing & Surface Specifications</h2>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Modifications made here immediately update rates and availability on the live website.</p>
+          </div>
+          <button class="btn btn-primary" onclick="saveAllGroundsCms()">
+            <span class="material-icons text-sm">save</span> Save All Arena Changes
+          </button>
+        </div>
+
+        <div id="adminGroundsList" style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: Membership Plans Editor (CMS)
+           ========================================== -->
+      <section id="membershipsCmsTab" class="admin-tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800;">Edit Membership Plans & Benefits</h2>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Changes here are instantly reflected on the public memberships section.</p>
+          </div>
+          <button class="btn btn-primary" onclick="saveAllMembershipsCms()">
+            <span class="material-icons text-sm">save</span> Save Membership Updates
+          </button>
+        </div>
+
+        <div id="adminMembershipsList" style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: Announcements & Emergency Alerts (CMS)
+           ========================================== -->
+      <section id="contentCmsTab" class="admin-tab-content">
+        <div class="glass-panel" style="padding: 2rem; max-width: 800px; margin-bottom: 2rem;">
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-icons text-accent">campaign</span> Top Promotional Announcement Bar
+          </h2>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            Appears pinned to the very top of the website for all visitors.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Announcement Message</label>
+            <input type="text" id="adminAnnouncementInput" class="form-control" placeholder="e.g. 🎉 Special Night League: 20% OFF on all 9 PM slots!" />
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <button class="btn btn-primary" onclick="saveAnnouncementCms()">
+              <span class="material-icons text-sm">publish</span> Publish Announcement Live
+            </button>
+            <button class="btn btn-secondary" onclick="clearAnnouncementCms()">
+              <span class="material-icons text-sm">delete</span> Clear / Hide Banner
+            </button>
+          </div>
+        </div>
+
+        <!-- Emergency Alert Tool -->
+        <div class="glass-panel" style="padding: 2rem; max-width: 800px; border-left: 4px solid var(--danger);">
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--danger); display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-icons">warning</span> Broadcast Emergency Weather / Maintenance Alert
+          </h2>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            Instantly pushes a priority alert notification to all active users on the website.
+          </p>
+
+          <div class="form-group">
+            <input type="text" id="emergencyAlertInput" class="form-control" value="⚡ Rain Alert: Outdoor football matches paused for 15 mins. Lockers and cafe lounge open." />
+          </div>
+
+          <button class="btn btn-secondary" style="color: var(--danger); border-color: var(--danger); margin-top: 0.5rem;" onclick="broadcastEmergencyAlert()">
+            <span class="material-icons text-sm">notifications_active</span> Broadcast Alert Live
+          </button>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: Registered Accounts Manager
+           ========================================== -->
+      <section id="usersTab" class="admin-tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800;">Registered Accounts & Access List</h2>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Every user profile created through the website appears here with the date they registered.</p>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="overflow-x: auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Access</th>
+                <th>Registered On</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersTableBody">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 5: Bookings & Reservations Manager
+           ========================================== -->
+      <section id="bookingsTab" class="admin-tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800;">Customer Reservations & Slot Manager</h2>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Manage real-time bookings, check entry passes, and issue cancellations.</p>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <input type="text" id="adminBookingSearch" class="form-control" placeholder="Search by ID or Player..." style="width: 250px; font-size: 0.85rem;" oninput="filterAdminBookings()" />
+          </div>
+        </div>
+
+        <div class="glass-panel" style="overflow-x: auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Player Name</th>
+                <th>Arena & Sport</th>
+                <th>Play Date & Time</th>
+                <th>Add-ons</th>
+                <th>Total Paid</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminBookingsTableBody">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Admin Logic Script -->
+  <script src="app.js"></script>
+  <script>
+    // ==========================================
+    // Master Passcode Security
+    // ==========================================
+    window.MASTER_ADMIN_PASS = window.MASTER_ADMIN_PASS || String.fromCharCode(49,48,49,48,49,48);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = JSON.parse(localStorage.getItem("sg_user") || "null");
+      if (!user || !user.loggedIn) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      const form = document.getElementById("adminLoginForm");
+      if (form) form.addEventListener("submit", handlePasscodeSubmit);
+
+      checkAdminAuthentication();
+      loadAdminDashboardData();
+      renderAdminGroundsCms();
+      renderAdminMembershipsCms();
+      renderAdminUsers();
+      renderAdminBookings();
+    });
+
+    function checkAdminAuthentication() {
+      const user = JSON.parse(localStorage.getItem("sg_user") || "null");
+      const isAuth = sessionStorage.getItem("sg_admin_authenticated") === "true" || (user && user.isAdmin === true);
+      const lockScreen = document.getElementById("adminLockScreen");
+
+      if (isAuth) {
+        sessionStorage.setItem("sg_admin_authenticated", "true");
+        if (lockScreen) lockScreen.classList.add("unlocked");
+      } else {
+        if (lockScreen) lockScreen.classList.remove("unlocked");
+        setTimeout(() => {
+          document.getElementById("adminPinInput")?.focus();
+        }, 100);
+      }
+    }
+
+    function handlePasscodeSubmit(e) {
+      e.preventDefault();
+      const pinInput = document.getElementById("adminPinInput");
+      const errorMsg = document.getElementById("pinErrorMsg");
+      const lockCard = document.getElementById("lockCard");
+      const lockScreen = document.getElementById("adminLockScreen");
+
+      if (!pinInput || !lockScreen || !errorMsg || !lockCard) return;
+
+      if (pinInput.value.trim() === window.MASTER_ADMIN_PASS) {
+        sessionStorage.setItem("sg_admin_authenticated", "true");
+        errorMsg.textContent = "";
+        lockScreen.classList.add("unlocked");
+        showToast("Admin access granted! Welcome back. 🔓", "success");
+      } else {
+        errorMsg.textContent = "Invalid passcode. Access denied.";
+        lockCard.classList.add("shake-anim");
+        pinInput.value = "";
+        pinInput.focus();
+        setTimeout(() => {
+          lockCard.classList.remove("shake-anim");
+        }, 500);
+      }
+    }
+
+    function lockAdminConsole() {
+      sessionStorage.removeItem("sg_admin_authenticated");
+      const lockScreen = document.getElementById("adminLockScreen");
+      if (lockScreen) {
+        lockScreen.classList.remove("unlocked");
+        const pinInput = document.getElementById("adminPinInput");
+        if (pinInput) {
+          pinInput.value = "";
+          pinInput.focus();
+        }
+      }
+      showToast("Admin console locked.", "info");
+    }
+
+    function switchAdminTab(tabId, btn) {
+      document.querySelectorAll(".admin-tab-content").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".admin-nav-item").forEach(el => el.classList.remove("active"));
+
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add("active");
+      if (btn) btn.classList.add("active");
+    }
+
+    function loadAdminDashboardData() {
+      const visitors = localStorage.getItem("sg_visitor_count") || "12482";
+      const totalVisitorsEl = document.getElementById("adminTotalVisitors");
+      if (totalVisitorsEl) totalVisitorsEl.textContent = parseInt(visitors).toLocaleString();
+
+      const annInput = document.getElementById("adminAnnouncementInput");
+      if (annInput) annInput.value = localStorage.getItem("sg_announcement") || "";
+
+      const bookings = JSON.parse(localStorage.getItem("sg_bookings") || "[]");
+      const rev = bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+      const revEl = document.getElementById("adminTodayRevenue");
+      if (revEl) revEl.textContent = `₹${rev.toLocaleString()}`;
+    }
+
+    function renderAdminGroundsCms() {
+      const container = document.getElementById("adminGroundsList");
+      if (!container) return;
+
+      const grounds = getStoredGrounds();
+      container.innerHTML = grounds.map((g, idx) => `
+        <div class="glass-panel" style="padding: 1.5rem;" data-ground-idx="${idx}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) 150px; gap: 1rem; align-items: center;">
+            <div>
+              <label class="form-label">Arena Name</label>
+              <input type="text" class="form-control ground-name-input" value="${g.name}" />
+            </div>
+
+            <div>
+              <label class="form-label">Hourly Rate (₹ / hr)</label>
+              <input type="number" class="form-control ground-rate-input" value="${g.ratePerHour}" />
+            </div>
+
+            <div>
+              <label class="form-label">Surface Specification</label>
+              <input type="text" class="form-control ground-surface-input" value="${g.surface}" />
+            </div>
+
+            <div>
+              <label class="form-label">Player Capacity</label>
+              <input type="text" class="form-control ground-capacity-input" value="${g.capacity}" />
+            </div>
+
+            <div>
+              <label class="form-label">Arena Status</label>
+              <select class="form-control ground-status-select">
+                <option value="available" ${g.status !== 'maintenance' ? 'selected' : ''}>Active / Open</option>
+                <option value="maintenance" ${g.status === 'maintenance' ? 'selected' : ''}>Under Maintenance</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderAdminMembershipsCms() {
+      const container = document.getElementById("adminMembershipsList");
+      if (!container) return;
+
+      const memberships = getStoredMemberships();
+      container.innerHTML = memberships.map((m, idx) => `
+        <div class="glass-panel" style="padding: 1.5rem;" data-membership-idx="${idx}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: end;">
+            <div>
+              <label class="form-label">Membership Name</label>
+              <input type="text" class="form-control membership-name-input" value="${m.name}" />
+            </div>
+            <div>
+              <label class="form-label">Tagline</label>
+              <input type="text" class="form-control membership-tagline-input" value="${m.tagline}" />
+            </div>
+            <div>
+              <label class="form-label">Price (₹)</label>
+              <input type="number" class="form-control membership-price-input" value="${m.price}" />
+            </div>
+            <div>
+              <label class="form-label">Period</label>
+              <input type="text" class="form-control membership-period-input" value="${m.period || '/ month'}" />
+            </div>
+            <div>
+              <label class="form-label">Badge</label>
+              <input type="text" class="form-control membership-badge-input" value="${m.badge || ''}" placeholder="Most Popular" />
+            </div>
+            <div>
+              <label class="form-label">Primary Button</label>
+              <input type="text" class="form-control membership-btn-text-input" value="${m.btnText || 'Get Started'}" />
+            </div>
+            <div>
+              <label class="form-label">Button Action</label>
+              <select class="form-control membership-btn-action-select">
+                <option value="explore" ${m.btnAction === 'explore' ? 'selected' : ''}>Explore Grounds</option>
+                <option value="subscribe" ${m.btnAction === 'subscribe' ? 'selected' : ''}>Subscribe</option>
+                <option value="corporate" ${m.btnAction === 'corporate' ? 'selected' : ''}>Corporate Inquiry</option>
+              </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; min-height: 52px;">
+              <input type="checkbox" class="membership-featured-input" id="featured-${idx}" ${m.isFeatured === true ? 'checked' : ''} />
+              <label for="featured-${idx}" style="margin: 0; color: var(--text-main); font-weight: 700;">Featured Plan</label>
+            </div>
+          </div>
+
+          <div style="margin-top: 1rem;">
+            <label class="form-label">Features (one per line)</label>
+            <textarea class="form-control membership-features-input" rows="5">${(m.features || []).join("\n")}</textarea>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function saveAllMembershipsCms() {
+      const memberships = getStoredMemberships();
+      const cards = document.querySelectorAll("#adminMembershipsList .glass-panel");
+
+      cards.forEach((card, idx) => {
+        if (memberships[idx]) {
+          memberships[idx].name = card.querySelector(".membership-name-input").value.trim() || memberships[idx].name;
+          memberships[idx].tagline = card.querySelector(".membership-tagline-input").value.trim() || memberships[idx].tagline;
+          memberships[idx].price = parseInt(card.querySelector(".membership-price-input").value, 10) || 0;
+          memberships[idx].period = card.querySelector(".membership-period-input").value.trim() || memberships[idx].period || '/ month';
+          memberships[idx].badge = card.querySelector(".membership-badge-input").value.trim();
+          memberships[idx].isFeatured = card.querySelector(".membership-featured-input").checked;
+          memberships[idx].btnText = card.querySelector(".membership-btn-text-input").value.trim() || memberships[idx].btnText;
+          memberships[idx].btnAction = card.querySelector(".membership-btn-action-select").value || memberships[idx].btnAction;
+
+          const features = card.querySelector(".membership-features-input").value
+            .split("\n")
+            .map(feature => feature.trim())
+            .filter(Boolean);
+
+          memberships[idx].features = features.length ? features : memberships[idx].features || [];
+        }
+      });
+
+      saveMembershipsToStorage(memberships);
+      renderMemberships();
+      showToast("Membership plans updated and published live! 🏆", "success");
+    }
+
+    function saveAllGroundsCms() {
+      const grounds = getStoredGrounds();
+      const cards = document.querySelectorAll("#adminGroundsList .glass-panel");
+
+      cards.forEach((card, idx) => {
+        if (grounds[idx]) {
+          grounds[idx].name = card.querySelector(".ground-name-input").value;
+          grounds[idx].ratePerHour = parseInt(card.querySelector(".ground-rate-input").value, 10) || grounds[idx].ratePerHour;
+          grounds[idx].surface = card.querySelector(".ground-surface-input").value;
+          grounds[idx].capacity = card.querySelector(".ground-capacity-input").value;
+          grounds[idx].status = card.querySelector(".ground-status-select").value;
+        }
+      });
+
+      saveGroundsToStorage(grounds);
+      showToast("All Arena configurations saved and published live! 🚀", "success");
+    }
+
+    function saveAnnouncementCms() {
+      const text = document.getElementById("adminAnnouncementInput").value;
+      localStorage.setItem("sg_announcement", text);
+      showToast("Announcement banner updated on live website!", "success");
+    }
+
+    function clearAnnouncementCms() {
+      localStorage.removeItem("sg_announcement");
+      document.getElementById("adminAnnouncementInput").value = "";
+      showToast("Announcement banner cleared.", "info");
+    }
+
+    function broadcastEmergencyAlert() {
+      const msg = document.getElementById("emergencyAlertInput").value;
+      localStorage.setItem("sg_announcement", `⚠️ EMERGENCY ALERT: ${msg}`);
+      showToast("Priority emergency broadcast sent to all player screens!", "error");
+    }
+
+    function renderAdminUsers() {
+      const tbody = document.getElementById("adminUsersTableBody");
+      if (!tbody) return;
+
+      const users = getRegisteredUsers();
+
+      if (users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No registered accounts found yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = users.map(user => {
+        const registeredDate = user.registeredAt ? new Date(user.registeredAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "N/A";
+        const accessLabel = user.isAdmin ? "Admin Access" : "Standard User";
+
+        return `
+          <tr>
+            <td><strong>${user.name || 'Unnamed User'}</strong></td>
+            <td>${user.email || 'N/A'}</td>
+            <td>${user.role || 'Player'}</td>
+            <td><span class="status-pill ${user.isAdmin ? 'status-online' : 'status-busy'}">${accessLabel}</span></td>
+            <td>${registeredDate}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderAdminBookings() {
+      const tbody = document.getElementById("adminBookingsTableBody");
+      if (!tbody) return;
+
+      const bookings = JSON.parse(localStorage.getItem("sg_bookings") || "[]");
+
+      if (bookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No player bookings recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = bookings.map(b => `
+        <tr>
+          <td><strong style="color: var(--primary);">${b.id}</strong></td>
+          <td><strong>${b.user || 'Guest Athlete'}</strong></td>
+          <td>${b.groundName}</td>
+          <td>${b.date} <br/><span style="font-size: 0.78rem; color: var(--text-dim);">${b.slot}</span></td>
+          <td>${b.addons && b.addons.length > 0 ? b.addons.join(", ") : "None"}</td>
+          <td><strong style="color: var(--primary);">₹${b.totalAmount}</strong></td>
+          <td><span class="status-pill status-online">${b.status}</span></td>
+          <td>
+            <div style="display: flex; gap: 0.4rem;">
+              <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="adminViewPass('${b.id}')">Pass</button>
+              <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="adminCancelBooking('${b.id}')">Refund</button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function filterAdminBookings() {
+      const q = document.getElementById("adminBookingSearch").value.toLowerCase();
+      const rows = document.querySelectorAll("#adminBookingsTableBody tr");
+
+      rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        r.style.display = text.includes(q) ? "" : "none";
+      });
+    }
+
+    function adminCancelBooking(id) {
+      if (confirm(`Refund and cancel reservation ${id}?`)) {
+        let bookings = JSON.parse(localStorage.getItem("sg_bookings") || "[]");
+        bookings = bookings.filter(b => b.id !== id);
+        localStorage.setItem("sg_bookings", JSON.stringify(bookings));
+        renderAdminBookings();
+        loadAdminDashboardData();
+        showToast(`Booking ${id} refunded and slot reopened.`, "info");
+      }
+    }
+
+    function adminViewPass(id) {
+      window.location.href = `index.html`;
+    }
+  </script>
+</body>
+</html>

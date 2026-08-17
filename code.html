@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SMS Smart Ground - Book FIFA-grade Football Turfs, Box Cricket Arenas, ITF Tennis Courts, Hardwood Basketball & Badminton Courts with instant live slot availability." />
+  <meta name="keywords" content="sports ground booking, football turf, box cricket arena, tennis court booking, badminton court rental, smart ground" />
+  <meta property="og:title" content="SMS Smart Ground | Premier Multi-Sport Arenas & Live Slot Booking" />
+  <meta property="og:description" content="Fast, seamless sports facility booking with real-time slot availability, tournament floodlights, and community matchmaking." />
+  <meta property="og:type" content="website" />
+  
+  <title>SMS Smart Ground | Premier Multi-Sport Arenas & Live Slot Booking</title>
+  
+  <!-- Google Fonts & Material Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  
+  <!-- Google Identity Services Client API -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Top Announcement Banner -->
+  <div class="announcement-banner" id="topAnnouncementBanner">
+    <span class="material-icons text-sm">campaign</span>
+    <span id="announcementText">🎉 Special Night League: 20% OFF on all 9 PM - 11 PM slots this weekend! Use code: NIGHTPLAY</span>
+  </div>
+
+  <!-- Site Header / Navigation Bar -->
+  <header class="site-header">
+    <div class="container header-container">
+      <!-- Brand Logo -->
+      <a href="#" class="brand-logo">
+        <div class="logo-icon-box">
+          <span class="material-icons">sports_soccer</span>
+        </div>
+        <div class="brand-title">
+          SMS <span>SMART GROUND</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links (Public Menu - Admin hidden) -->
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#groundsSection" class="nav-link">Arenas & Grounds</a></li>
+          <li><a href="#openMatchesSection" class="nav-link">Open Matches</a></li>
+          <li><a href="#membershipSection" class="nav-link">Memberships</a></li>
+          <li><a href="#facilitiesSection" class="nav-link">Amenities</a></li>
+          <li><a href="#faqSection" class="nav-link">FAQ</a></li>
+          <li><a href="#contactSection" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="header-actions">
+        <!-- Theme Toggle -->
+        <button class="btn btn-secondary btn-icon theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+          <span class="material-icons text-sm" id="themeIcon">light_mode</span>
+        </button>
+
+        <!-- My Bookings Button -->
+        <button class="btn btn-secondary btn-icon bookings-badge-btn" onclick="openMyBookingsDrawer()" title="View My Bookings" aria-label="View My Bookings">
+          <span class="material-icons text-sm">event_note</span>
+          <span class="cart-count" id="bookingCountBadge">1</span>
+        </button>
+
+        <!-- User Profile Dropdown (Shown when logged in) -->
+        <div class="user-profile-menu-wrap" id="userProfileMenuWrap" style="display: none;">
+          <div class="user-profile-trigger" onclick="toggleUserDropdown()">
+            <img src="" id="headerUserAvatar" class="user-avatar-img" alt="User Avatar" />
+            <span id="headerUserName" style="font-weight: 700; font-size: 0.88rem;">Athlete</span>
+            <span class="material-icons text-xs">expand_more</span>
+          </div>
+
+          <!-- Dropdown Card -->
+          <div class="user-dropdown-card" id="userDropdownCard">
+            <div class="dropdown-user-header">
+              <div class="dropdown-user-name" id="dropUserName">Rahul Verma</div>
+              <div class="dropdown-user-email" id="dropUserEmail">rahul.verma@gmail.com</div>
+              <span class="dropdown-user-role" id="dropUserRole">Regular Athlete</span>
+            </div>
+
+            <!-- Admin Console Link (ONLY visible when authenticated as Ground Admin) -->
+            <a href="admin.html" class="dropdown-action-btn" id="dropAdminLink" style="display: none; background: rgba(16, 185, 129, 0.12); color: var(--primary);">
+              <span class="material-icons text-sm text-primary">admin_panel_settings</span>
+              <span><strong>Admin Console</strong></span>
+            </a>
+
+            <button class="dropdown-action-btn" onclick="openMyBookingsDrawer()">
+              <span class="material-icons text-sm text-primary">confirmation_number</span>
+              <span>My Passes & Bookings</span>
+            </button>
+
+            <button class="dropdown-action-btn" onclick="signOutUser()" style="color: var(--danger); border-top: 1px solid var(--border-color); margin-top: 0.35rem; padding-top: 0.6rem;">
+              <span class="material-icons text-sm">logout</span>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Google Sign-In / Sign-Up Trigger Button (Shown when logged out) -->
+        <button class="btn btn-primary" id="navAuthBtn" onclick="openAuthModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right: 0.3rem;">
+            <path fill="#ffffff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#ffffff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#ffffff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#ffffff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Sign In / Sign Up</span>
+        </button>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle Mobile Navigation">
+          <span class="material-icons">menu</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Dropdown (Public - Admin hidden) -->
+  <div id="mobileNavMenu" style="display: none; position: fixed; top: 76px; left: 0; width: 100%; background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 1.5rem; z-index: 999;">
+    <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem;">
+      <li><a href="#home" class="nav-link" onclick="toggleMobileMenu()">Home</a></li>
+      <li><a href="#groundsSection" class="nav-link" onclick="toggleMobileMenu()">Arenas & Grounds</a></li>
+      <li><a href="#openMatchesSection" class="nav-link" onclick="toggleMobileMenu()">Open Matches</a></li>
+      <li><a href="#membershipSection" class="nav-link" onclick="toggleMobileMenu()">Memberships</a></li>
+      <li><a href="#facilitiesSection" class="nav-link" onclick="toggleMobileMenu()">Amenities</a></li>
+      <li><a href="#faqSection" class="nav-link" onclick="toggleMobileMenu()">FAQ</a></li>
+      <li><a href="#contactSection" class="nav-link" onclick="toggleMobileMenu()">Contact</a></li>
+    </ul>
+  </div>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+      <div class="hero-bg-overlay"></div>
+      <div class="hero-gradient"></div>
+
+      <div class="container hero-content">
+        <div class="hero-live-pill">
+          <div class="live-indicator-dot"></div>
+          <span>4 ARENAS LIVE & FLOODLIT TONIGHT</span>
+        </div>
+
+        <h1 class="hero-title">
+          PLAY ON ELITE TURF.<br />
+          <span style="color: var(--primary);" class="text-glow">BOOK IN SECONDS.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Experience tournament-standard FIFA turf, enclosed box cricket pitches, hard tennis courts, and indoor hardwood arenas with instant real-time slot reservations.
+        </p>
+
+        <!-- Quick Booking Search Bar -->
+        <div class="quick-booking-bar">
+          <div class="quick-filter-item">
+            <label class="quick-filter-label">
+              <span class="material-icons text-xs">sports</span> Sport Arena
+            </label>
+            <select class="quick-filter-select" id="quickSportSelect">
+              <option value="all">All Sports Arenas</option>
+              <option value="football">Football / 7v7 Turf</option>
+              <option value="cricket">Box Cricket Turf</option>
+              <option value="tennis">Championship Tennis</option>
+              <option value="basketball">Basketball Hardwood</option>
+              <option value="badminton">Indoor Badminton</option>
+            </select>
+          </div>
+
+          <div class="quick-filter-item">
+            <label class="quick-filter-label">
+              <span class="material-icons text-xs">calendar_today</span> Play Date
+            </label>
+            <input type="date" class="quick-filter-input date-input-field" id="quickDateInput" />
+          </div>
+
+          <div class="quick-filter-item">
+            <label class="quick-filter-label">
+              <span class="material-icons text-xs">schedule</span> Time Preference
+            </label>
+            <select class="quick-filter-select" id="quickTimePref">
+              <option value="any">Any Available Slot</option>
+              <option value="morning">Morning (6 AM - 11 AM)</option>
+              <option value="evening">Evening (4 PM - 7 PM)</option>
+              <option value="night">Floodlit Night (7 PM - 11 PM)</option>
+            </select>
+          </div>
+
+          <div>
+            <button class="btn btn-primary" onclick="handleQuickSearch()" style="width: 100%; height: 50px;">
+              <span class="material-icons text-sm">search</span>
+              Find Available Slots
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Counters Row -->
+        <div class="hero-stats-row">
+          <div class="stat-box">
+            <div class="stat-number">4.9<span>★</span></div>
+            <div class="stat-label">Player Satisfaction Rating</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="liveVisitorCount">12,482</div>
+            <div class="stat-label">Total Website Visitors</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">1,000<span> Lux</span></div>
+            <div class="stat-label">Anti-Glare Night Floodlights</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">100<span>%</span></div>
+            <div class="stat-label">Instant Slot Confirmation</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Facility & Weather Status Section -->
+    <section class="live-status-section">
+      <div class="container">
+        <div class="live-grid">
+          <!-- Turf Live Status Chips -->
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+              <span class="live-indicator-dot"></span> Real-Time Arena Availability Status
+            </div>
+            <div class="live-turf-chips">
+              <div class="turf-status-chip">
+                <div class="turf-status-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--primary);">
+                  <span class="material-icons">sports_soccer</span>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.9rem;">Pitch 1 (Football)</div>
+                  <span class="status-badge-live badge-available">Open & Ready</span>
+                </div>
+              </div>
+
+              <div class="turf-status-chip">
+                <div class="turf-status-icon" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);">
+                  <span class="material-icons">sports_cricket</span>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.9rem;">Thunder Box Cricket</div>
+                  <span class="status-badge-live badge-occupied">In Play (till 8 PM)</span>
+                </div>
+              </div>
+
+              <div class="turf-status-chip">
+                <div class="turf-status-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--primary);">
+                  <span class="material-icons">sports_tennis</span>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.9rem;">Grand Slam Tennis</div>
+                  <span class="status-badge-live badge-available">Available Now</span>
+                </div>
+              </div>
+
+              <div class="turf-status-chip">
+                <div class="turf-status-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--accent);">
+                  <span class="material-icons">sports_basketball</span>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.9rem;">Hardwood Basketball</div>
+                  <span class="status-badge-live badge-fast">Fast Filling</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weather & Ground Condition Widget -->
+          <div class="weather-widget">
+            <div>
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; margin-bottom: 0.2rem;">Live Ground Condition</div>
+              <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-main);">24°C • Optimal Turf</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">Wind: 8 km/h | Rain Risk: 0%</div>
+            </div>
+            <div style="font-size: 2.2rem; color: var(--secondary);">
+              <span class="material-icons" style="font-size: 2.8rem;">wb_sunny</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grounds & Arenas Catalog Section -->
+    <section class="section" id="groundsSection">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="badge-tag">
+            <span class="material-icons text-xs">stadium</span> Premium Facilities
+          </div>
+          <h2 class="section-title">Explore Our World-Class Arenas</h2>
+          <p class="section-subtitle">
+            Engineered to international tournament standards with high-spec shock absorption, precision bounce, and night illumination.
+          </p>
+        </div>
+
+        <!-- Sport Filter Pills -->
+        <div class="grounds-filter-nav">
+          <button class="filter-pill-btn active" data-filter="all">
+            <span class="material-icons text-sm">dashboard</span> All Arenas (5)
+          </button>
+          <button class="filter-pill-btn" data-filter="football">
+            <span class="material-icons text-sm">sports_soccer</span> Football / Turf
+          </button>
+          <button class="filter-pill-btn" data-filter="cricket">
+            <span class="material-icons text-sm">sports_cricket</span> Box Cricket
+          </button>
+          <button class="filter-pill-btn" data-filter="tennis">
+            <span class="material-icons text-sm">sports_tennis</span> Tennis Court
+          </button>
+          <button class="filter-pill-btn" data-filter="basketball">
+            <span class="material-icons text-sm">sports_basketball</span> Basketball
+          </button>
+          <button class="filter-pill-btn" data-filter="badminton">
+            <span class="material-icons text-sm">sports_tennis</span> Badminton
+          </button>
+        </div>
+
+        <!-- Dynamic Grounds Grid -->
+        <div class="grounds-grid" id="groundsGrid">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Community Open Matches & Team Matchmaking -->
+    <section class="section" id="openMatchesSection" style="background: var(--bg-secondary); border-block: 1px solid var(--border-color);">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="badge-tag" style="color: var(--secondary); background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.25);">
+            <span class="material-icons text-xs">groups</span> Solo Player or Incomplete Team?
+          </div>
+          <h2 class="section-title">Join Open Matches & Leagues</h2>
+          <p class="section-subtitle">
+            Never miss game night. Hop into public matches organized by local teams or host your own open lobby.
+          </p>
+        </div>
+
+        <div class="match-cards-grid" id="openMatchesGrid">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Facility Amenities & Standard Features -->
+    <section class="section" id="facilitiesSection">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="badge-tag">
+            <span class="material-icons text-xs">verified</span> Pro Athlete Experience
+          </div>
+          <h2 class="section-title">Built for Peak Performance</h2>
+          <p class="section-subtitle">
+            Every detail is designed to give you an uncompromised sports experience from warm-up to post-match relaxation.
+          </p>
+        </div>
+
+        <div class="facilities-grid">
+          <div class="facility-card glass-panel">
+            <div class="facility-icon-circle">
+              <span class="material-icons">grass</span>
+            </div>
+            <h3 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem;">FIFA-Grade Turf</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">High-density 50mm monofilament yarn with eco-friendly sand and rubber infill for reduced joint strain.</p>
+          </div>
+
+          <div class="facility-card glass-panel">
+            <div class="facility-icon-circle">
+              <span class="material-icons">wb_incandescent</span>
+            </div>
+            <h3 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem;">1,000 Lux Floodlights</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Tournament-certified anti-glare vertical LED lighting arrays ensuring crystal-clear vision for night fixtures.</p>
+          </div>
+
+          <div class="facility-card glass-panel">
+            <div class="facility-icon-circle">
+              <span class="material-icons">videocam</span>
+            </div>
+            <h3 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem;">HD Action Replay</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Automated multi-angle cameras record your best goals, sixes, and aces with instant video highlights download.</p>
+          </div>
+
+          <div class="facility-card glass-panel">
+            <div class="facility-icon-circle">
+              <span class="material-icons">shower</span>
+            </div>
+            <h3 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem;">Locker & Shower Suites</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Hygienic changing rooms, digital RFID lockers, heated showers, and clean grooming stations.</p>
+          </div>
+
+          <div class="facility-card glass-panel">
+            <div class="facility-icon-circle">
+              <span class="material-icons">local_cafe</span>
+            </div>
+            <h3 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem;">Sports Cafe & Lounge</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Recharge with fresh fruit smoothies, electrolyte hydration packs, protein bars, and spectator viewing lounges.</p>
+          </div>
+
+          <div class="facility-card glass-panel">
+            <div class="facility-icon-circle">
+              <span class="material-icons">medical_services</span>
+            </div>
+            <h3 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem;">First Aid & Physio Kit</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Trained first-response staff on-site with cold compression packs, AED defibrillator, and medical support.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Memberships & League Passes -->
+    <section class="section" id="membershipSection" style="background: var(--bg-secondary); border-block: 1px solid var(--border-color);">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="badge-tag">
+            <span class="material-icons text-xs">card_membership</span> Flexible Memberships
+          </div>
+          <h2 class="section-title">Play Regularly? Save More.</h2>
+          <p class="section-subtitle">
+            Choose a pass tailored to your team's schedule, with priority prime-time bookings and discounted equipment rentals.
+          </p>
+        </div>
+
+        <div class="membership-grid">
+          <!-- Plan 1 -->
+          <div class="pricing-card glass-panel">
+            <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main);">Pay As You Play</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">For casual weekend squads</p>
+            <div class="pricing-amount">₹0 <span>/ month</span></div>
+            <ul class="pricing-features-list">
+              <li class="pricing-feature-item"><span class="material-icons">check</span> Book any arena on demand</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> 7-day advance booking window</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> Free parking & locker access</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> Digital match pass</li>
+            </ul>
+            <a href="#groundsSection" class="btn btn-secondary" style="margin-top: auto;">Explore Grounds</a>
+          </div>
+
+          <!-- Plan 2 (Featured) -->
+          <div class="pricing-card glass-panel featured">
+            <div class="pricing-badge">Most Popular</div>
+            <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main);">Weekend Warrior Pass</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">For regular teams & weekly leagues</p>
+            <div class="pricing-amount">₹3,499 <span>/ month</span></div>
+            <ul class="pricing-features-list">
+              <li class="pricing-feature-item"><span class="material-icons">check</span> 4x Prime Time 60-min slots included</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> 20% discount on all additional slots</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> Free Pro Match Ball & Bibs rental</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> 14-day priority booking window</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> HD match video recording included</li>
+            </ul>
+            <button class="btn btn-primary" onclick="showToast('Weekend Warrior membership selected! Our membership manager will contact you.', 'success')" style="margin-top: auto;">Get Started</button>
+          </div>
+
+          <!-- Plan 3 -->
+          <div class="pricing-card glass-panel">
+            <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main);">Corporate & Club Pass</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">For corporate leagues & academies</p>
+            <div class="pricing-amount">₹8,999 <span>/ month</span></div>
+            <ul class="pricing-features-list">
+              <li class="pricing-feature-item"><span class="material-icons">check</span> 12x Dedicated arena slots / month</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> Dedicated umpire & referee on-demand</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> Custom tournament branding</li>
+              <li class="pricing-feature-item"><span class="material-icons">check</span> Unlimited video recording & analytics</li>
+            </ul>
+            <button class="btn btn-secondary" onclick="showToast('Corporate inquiry initiated. An account manager will reach out within 2 hours.', 'info')" style="margin-top: auto;">Inquire Corporate</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Frequently Asked Questions (Accordion) -->
+    <section class="section" id="faqSection">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="badge-tag">
+            <span class="material-icons text-xs">help_outline</span> Got Questions?
+          </div>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <p class="section-subtitle">
+            Find immediate answers regarding booking policies, cancellations, equipment, and footwear guidelines.
+          </p>
+        </div>
+
+        <div class="faq-accordion-wrap">
+          <div class="faq-item active">
+            <button class="faq-question-btn" onclick="toggleFaq(this)">
+              <span>What type of footwear is allowed on the turf and courts?</span>
+              <span class="material-icons faq-icon">expand_more</span>
+            </button>
+            <div class="faq-answer-content">
+              For football turf: Rubber studs (TF/AG) and flat sports sneakers are permitted. Metal studs are strictly prohibited to protect the turf. For tennis, basketball, and badminton: Non-marking rubber court shoes are mandatory.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question-btn" onclick="toggleFaq(this)">
+              <span>What is your cancellation and rain refund policy?</span>
+              <span class="material-icons faq-icon">expand_more</span>
+            </button>
+            <div class="faq-answer-content">
+              Full 100% refund or free slot reschedule is provided if cancelled at least 4 hours before the booked time. In case of sudden heavy rain or thunderstorms, slot credits are automatically issued for full rescheduling.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question-btn" onclick="toggleFaq(this)">
+              <span>Can we rent equipment like balls, bibs, and rackets on site?</span>
+              <span class="material-icons faq-icon">expand_more</span>
+            </button>
+            <div class="faq-answer-content">
+              Yes! You can add equipment add-ons during online booking or rent them directly from our reception pro shop. We stock tournament-grade footballs, cricket leather/tennis balls, Yonex badminton rackets, and Wilson tennis balls.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question-btn" onclick="toggleFaq(this)">
+              <span>Are floodlights included in evening and night slot bookings?</span>
+              <span class="material-icons faq-icon">expand_more</span>
+            </button>
+            <div class="faq-answer-content">
+              Yes, 1,000 Lux tournament LED lighting is fully integrated and turned on automatically for all evening and night slots with zero hidden surcharges.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact & Location Map Section -->
+    <section class="section" id="contactSection" style="background: var(--bg-secondary); border-top: 1px solid var(--border-color);">
+      <div class="container">
+        <div class="section-title-wrap">
+          <div class="badge-tag">
+            <span class="material-icons text-xs">location_on</span> Visit Us
+          </div>
+          <h2 class="section-title">Get In Touch & Venue Details</h2>
+          <p class="section-subtitle">
+            Need custom tournament booking, corporate league coordination, or venue directions? Drop us a message.
+          </p>
+        </div>
+
+        <div class="contact-grid">
+          <!-- Contact Form -->
+          <div class="glass-panel" style="padding: 2.25rem;">
+            <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1.5rem;">Send a Quick Inquiry</h3>
+            <form onsubmit="handleContactSubmit(event)">
+              <div class="form-group">
+                <label class="form-label" for="contactName">Your Full Name</label>
+                <input type="text" id="contactName" class="form-control" placeholder="e.g. Rahul Verma" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contactPhone">Phone / WhatsApp Number</label>
+                <input type="tel" id="contactPhone" class="form-control" placeholder="+91 98765 43210" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contactSport">Interested Sport / Purpose</label>
+                <select id="contactSport" class="form-control">
+                  <option>Football Turf Slot</option>
+                  <option>Box Cricket League</option>
+                  <option>Tennis Court Hourly</option>
+                  <option>Corporate Tournament Booking</option>
+                  <option>Coaching Academy Partnership</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contactMessage">Special Requests / Message</label>
+                <textarea id="contactMessage" class="form-control" rows="4" placeholder="Mention dates, team size or custom equipment needed..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <span class="material-icons text-sm">send</span> Submit Inquiry
+              </button>
+            </form>
+          </div>
+
+          <!-- Location Info & Working Hours -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="glass-panel" style="padding: 2rem;">
+              <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-icons text-primary">schedule</span> Arena Operating Hours
+              </h3>
+              <div style="display: flex; justify-content: space-between; padding-block: 0.6rem; border-bottom: 1px solid var(--border-color); font-size: 0.95rem;">
+                <span style="color: var(--text-muted);">Monday – Friday:</span>
+                <span style="font-weight: 700; color: var(--primary);">06:00 AM – 12:00 Midnight</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-block: 0.6rem; border-bottom: 1px solid var(--border-color); font-size: 0.95rem;">
+                <span style="color: var(--text-muted);">Saturday & Sunday:</span>
+                <span style="font-weight: 700; color: var(--primary);">05:30 AM – 01:00 AM (Late Night)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-top: 0.6rem; font-size: 0.95rem;">
+                <span style="color: var(--text-muted);">Floodlights Support:</span>
+                <span style="font-weight: 700; color: var(--secondary);">Active till lights-out</span>
+              </div>
+            </div>
+
+            <div class="glass-panel" style="padding: 2rem;">
+              <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-icons text-primary">place</span> Ground Coordinates & Hotline
+              </h3>
+              <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                Smart Sports Complex, Plot 42, Olympic Avenue, Sports Hub Sector 8, City Center. (Ample 150+ Car & Bike Parking Available)
+              </p>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                <a href="tel:+919876543210" class="btn btn-secondary" style="font-size: 0.85rem;">
+                  <span class="material-icons text-xs">call</span> +91 98765 43210
+                </a>
+                <a href="https://wa.me/919876543210" target="_blank" class="btn btn-outline-primary" style="font-size: 0.85rem;">
+                  <span class="material-icons text-xs">chat</span> WhatsApp Chat
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand-logo" style="margin-bottom: 1.25rem;">
+            <div class="logo-icon-box">
+              <span class="material-icons">sports_soccer</span>
+            </div>
+            <div class="brand-title">
+              SMART SPORTS <span>GROUND</span>
+            </div>
+          </div>
+          <p style="font-size: 0.9rem; line-height: 1.6; max-width: 320px;">
+            State-of-the-art sports arena ecosystem empowering players, squads, and tournaments with instant booking, premium surfaces, and night leagues.
+          </p>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Sports Arenas</div>
+          <ul class="footer-links-list">
+            <li><a href="#groundsSection" class="footer-link" onclick="setFilter('football')">Football 7v7 Turf</a></li>
+            <li><a href="#groundsSection" class="footer-link" onclick="setFilter('cricket')">Box Cricket Arena</a></li>
+            <li><a href="#groundsSection" class="footer-link" onclick="setFilter('tennis')">Championship Tennis</a></li>
+            <li><a href="#groundsSection" class="footer-link" onclick="setFilter('basketball')">Hardwood Basketball</a></li>
+            <li><a href="#groundsSection" class="footer-link" onclick="setFilter('badminton')">Indoor Badminton</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Quick Links</div>
+          <ul class="footer-links-list">
+            <li><a href="#openMatchesSection" class="footer-link">Join Open Match</a></li>
+            <li><a href="#membershipSection" class="footer-link">Weekend Memberships</a></li>
+            <li><a href="#facilitiesSection" class="footer-link">Amenities & Lockers</a></li>
+            <li><a href="#faqSection" class="footer-link">Cancellation Policy</a></li>
+            <li><a href="javascript:void(0)" class="footer-link" onclick="openMyBookingsDrawer()">My Slot Bookings</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Stay Connected</div>
+          <p style="font-size: 0.88rem; margin-bottom: 1rem;">Subscribe for weekly night tournament announcements & discount passes.</p>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="email" placeholder="Your email address" class="form-control" style="font-size: 0.85rem; padding: 0.6rem 0.9rem;" />
+            <button class="btn btn-primary" onclick="showToast('Subscribed to tournament updates! 🏆', 'success')">Join</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <div>© 2026 SMS Smart Ground. All rights reserved. Play More. Wait Less.</div>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="#" class="footer-link">Privacy Policy</a>
+          <a href="#" class="footer-link">Terms of Service</a>
+          <a href="#" class="footer-link">Turf Guidelines</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL 1: Interactive Booking Engine Modal -->
+  <div class="modal-backdrop" id="bookingModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div>
+          <div class="badge-tag" style="margin-bottom: 0.25rem;">Instant Reservation</div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;" id="modalGroundTitle">Football Turf 7v7</h2>
+        </div>
+        <button class="modal-close-btn" onclick="closeBookingModal()" aria-label="Close modal">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Ground Image -->
+        <div style="margin-bottom: 1.25rem; border-radius: var(--radius-md); overflow: hidden; max-height: 240px;">
+          <img id="modalGroundImg" src="" alt="Arena" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+
+        <!-- Specs Bar -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.75rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 0.85rem;">
+          <div><span style="color: var(--text-muted);">Rate:</span> <strong id="modalGroundRate" style="color: var(--primary);">₹1400/hr</strong></div>
+          <div>•</div>
+          <div><span style="color: var(--text-muted);">Size:</span> <strong id="modalGroundDimensions">60m x 40m</strong></div>
+          <div>•</div>
+          <div><span style="color: var(--text-muted);">Capacity:</span> <strong id="modalGroundCapacity">14 - 18 Players</strong></div>
+          <div>•</div>
+          <div><span style="color: var(--text-muted);">Surface:</span> <strong id="modalGroundSurface">Grade-A FIFA Turf</strong></div>
+        </div>
+
+        <!-- Step 1: Select Date -->
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-size: 0.9rem; font-weight: 700;">
+            1. Select Playing Date
+          </label>
+          <input type="date" id="modalBookingDate" class="form-control date-input-field" onchange="renderSlotGrid(appState.selectedGround)" />
+        </div>
+
+        <!-- Step 2: Time Slots Matrix -->
+        <div style="margin-bottom: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label class="form-label" style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0;">
+              2. Choose Available Time Slots (Click to Select)
+            </label>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">*Floodlights included for night slots</span>
+          </div>
+          <div class="slots-time-grid" id="slotsTimeGrid">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+
+        <!-- Step 3: Equipment & Addons -->
+        <div style="margin-bottom: 2rem;">
+          <label class="form-label" style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.2rem;">
+            3. Optional Match Equipment & Add-ons
+          </label>
+          <div class="addons-grid" id="addonsGrid">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+
+        <!-- Step 4: Summary & Checkout -->
+        <div class="glass-panel" style="padding: 1.5rem; background: var(--bg-secondary);">
+          <h4 style="font-weight: 800; font-size: 1.05rem; margin-bottom: 1rem; display: flex; justify-content: space-between;">
+            <span>Booking Summary</span>
+            <span id="summarySlotsCount" style="color: var(--primary); font-size: 0.9rem;">0 slots selected</span>
+          </h4>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Slot(s) Total:</span>
+              <strong id="summarySlotsTotal" style="color: var(--text-main);">₹0</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Add-ons Total:</span>
+              <strong id="summaryAddonsTotal" style="color: var(--text-main);">₹0</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>GST & Arena Maintenance (5%):</span>
+              <strong id="summaryTax" style="color: var(--text-main);">₹0</strong>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <div>
+              <span style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Grand Total</span>
+              <div id="summaryGrandTotal" style="font-size: 1.6rem; font-weight: 900; color: var(--primary);">₹0</div>
+            </div>
+            <button class="btn btn-primary" id="proceedCheckoutBtn" onclick="completeBookingFlow()" style="padding: 0.85rem 2rem; font-size: 1rem;">
+              <span class="material-icons text-sm">lock</span>
+              Confirm & Generate Pass
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Digital Match Pass / Stadium Ticket -->
+  <div class="modal-backdrop" id="ticketModal">
+    <div class="modal-container" style="max-width: 580px;">
+      <div class="ticket-receipt-card">
+        <div class="ticket-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-icons">confirmation_number</span>
+            <strong style="font-size: 1.1rem; letter-spacing: 0.05em;">SMART GROUND PASS</strong>
+          </div>
+          <button class="modal-close-btn" onclick="closeTicketModal()" style="background: rgba(0,0,0,0.2); color: #fff;">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <div class="ticket-body">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--primary); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;">BOOKING PASS ID</div>
+            <div id="ticketIdText" style="font-size: 1.4rem; font-weight: 900; margin-bottom: 0.75rem;">SG-84920</div>
+
+            <div style="margin-bottom: 0.6rem;">
+              <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">ARENA</div>
+              <strong id="ticketGroundName" style="font-size: 0.95rem; color: #fff;">Premier Football Turf</strong>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.6rem;">
+              <div>
+                <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">DATE</div>
+                <strong id="ticketDate" style="font-size: 0.9rem; color: #fff;">Today</strong>
+              </div>
+              <div>
+                <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">TIME SLOT</div>
+                <strong id="ticketTime" style="font-size: 0.85rem; color: #fff;">08:00 PM - 09:00 PM</strong>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.6rem;">
+              <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">ADD-ONS</div>
+              <div id="ticketAddons" style="font-size: 0.85rem; color: var(--text-muted);">Pro Match Ball Set</div>
+            </div>
+
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">PLAYER</div>
+              <strong id="ticketPlayerName" style="font-size: 0.9rem; color: #fff;">Guest Athlete</strong>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="qr-code-box">
+              <svg width="110" height="110" viewBox="0 0 100 100" fill="#0f172a">
+                <rect x="10" y="10" width="25" height="25" fill="#0f172a" />
+                <rect x="15" y="15" width="15" height="15" fill="#ffffff" />
+                <rect x="19" y="19" width="7" height="7" fill="#0f172a" />
+                
+                <rect x="65" y="10" width="25" height="25" fill="#0f172a" />
+                <rect x="70" y="15" width="15" height="15" fill="#ffffff" />
+                <rect x="74" y="19" width="7" height="7" fill="#0f172a" />
+                
+                <rect x="10" y="65" width="25" height="25" fill="#0f172a" />
+                <rect x="15" y="70" width="15" height="15" fill="#ffffff" />
+                <rect x="19" y="74" width="7" height="7" fill="#0f172a" />
+                
+                <rect x="42" y="15" width="12" height="12" fill="#0f172a" />
+                <rect x="42" y="40" width="16" height="16" fill="#0f172a" />
+                <rect x="68" y="45" width="18" height="10" fill="#0f172a" />
+                <rect x="42" y="70" width="14" height="15" fill="#0f172a" />
+                <rect x="68" y="70" width="20" height="18" fill="#0f172a" />
+              </svg>
+              <div style="font-size: 0.65rem; font-weight: 800; color: #0f172a; letter-spacing: 0.1em;">SCAN AT GATE</div>
+            </div>
+            <div style="margin-top: 0.75rem; text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-dim);">PAID IN FULL</div>
+              <strong id="ticketAmount" style="font-size: 1.15rem; color: var(--primary);">₹1,522</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="perforated-divider"></div>
+
+        <div style="padding: 1.25rem 1.75rem; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 0.8rem; color: var(--text-muted);">
+            <span class="material-icons text-xs" style="vertical-align: middle;">verified</span> Entry pass valid 15 mins prior
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" onclick="printDigitalTicket()" style="padding: 0.4rem 0.9rem; font-size: 0.82rem;">
+              <span class="material-icons text-xs">print</span> Print / Save PDF
+            </button>
+            <button class="btn btn-primary" onclick="closeTicketModal()" style="padding: 0.4rem 0.9rem; font-size: 0.82rem;">
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWER: My Bookings -->
+  <div class="modal-backdrop" id="myBookingsDrawer">
+    <div class="modal-container" style="max-width: 480px; height: 100vh; max-height: 100vh; margin-left: auto; margin-right: 0; border-radius: 0; border-left: 1px solid var(--border-color);">
+      <div class="modal-header">
+        <h3 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-icons text-primary">confirmation_number</span> My Bookings & Passes
+        </h3>
+        <button class="modal-close-btn" onclick="closeMyBookingsDrawer()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body" id="bookingsListContainer">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Google Account Sign-In & Sign-Up Modal -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-container" style="max-width: 480px;">
+      <div class="modal-header">
+        <div style="display: flex; gap: 1rem; border-bottom: 2px solid transparent;">
+          <button id="authTabSignIn" class="btn" style="background: none; border-bottom: 2px solid var(--primary); border-radius: 0; padding: 0.4rem 0.5rem; color: var(--primary); font-weight: 800; font-size: 1rem;" onclick="switchAuthTab('signin')">
+            Sign In with Google
+          </button>
+          <button id="authTabSignUp" class="btn" style="background: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 0.4rem 0.5rem; color: var(--text-muted); font-weight: 700; font-size: 1rem;" onclick="switchAuthTab('signup')">
+            Create Google Account
+          </button>
+        </div>
+        <button class="modal-close-btn" onclick="closeAuthModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- TAB 1: Sign In View -->
+        <div id="googleSignInView">
+          <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div class="logo-icon-box" style="margin: 0 auto 0.75rem;">
+              <span class="material-icons">sports_soccer</span>
+            </div>
+            <h4 style="font-size: 1.15rem; font-weight: 800;">Sign in with your Google Account</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Enter your Google email and password / security PIN:</p>
+          </div>
+
+          <!-- Quick Connect with System Google Email -->
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label">Google Account Email</label>
+              <input type="email" id="googleCustomEmailInput" class="form-control" placeholder="e.g. rahul.verma@gmail.com" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Password / Security PIN</label>
+              <input type="password" id="googleCustomPassInput" class="form-control" placeholder="••••••••" />
+              <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 0.35rem;">
+                *Authorized admin access is restricted to approved ground operators only.
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label class="form-label">Display Name (Optional)</label>
+              <input type="text" id="googleCustomNameInput" class="form-control" placeholder="e.g. Rahul Verma" />
+            </div>
+
+            <button class="btn-google" onclick="handleGoogleInstantSignIn('custom')">
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>Sign In with Google</span>
+            </button>
+          </div>
+
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-dim); text-align: center; margin-bottom: 0.75rem; font-weight: 700;">
+            Or Fast Athlete Demo Sign In
+          </div>
+
+          <button class="btn-google" onclick="handleGoogleInstantSignIn('demo')" style="margin-bottom: 0.5rem;">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&q=80" style="width: 24px; height: 24px; border-radius: 50%;" />
+            <div style="text-align: left; flex-grow: 1;">
+              <div style="font-size: 0.88rem; font-weight: 700; color: #111827;">Rahul Verma (Athlete Profile)</div>
+              <div style="font-size: 0.75rem; color: #6b7280;">rahul.verma.sports@gmail.com</div>
+            </div>
+            <span class="material-icons text-xs" style="color: #9ca3af;">chevron_right</span>
+          </button>
+        </div>
+
+        <!-- TAB 2: Sign Up View -->
+        <div id="googleSignUpView" style="display: none;">
+          <div style="text-align: center; margin-bottom: 1.25rem;">
+            <h4 style="font-size: 1.15rem; font-weight: 800;">Register Athlete Profile</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Link your system Google account for instant match passes & bookings:</p>
+          </div>
+
+          <form onsubmit="handleGoogleSignUp(event)">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="signupFullName" class="form-control" placeholder="e.g. Alex Morgan" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Google Account Email</label>
+              <input type="email" id="signupGoogleEmail" class="form-control" placeholder="alex.morgan@gmail.com" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Set Password / PIN</label>
+              <input type="password" id="signupPass" class="form-control" placeholder="••••••••" required />
+              <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 0.35rem;">
+                *Restricted access is available only to authorized ground staff.
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" id="signupPhone" class="form-control" placeholder="+91 98765 43210" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Preferred Sport</label>
+                <select id="signupPrefSport" class="form-control">
+                  <option>Football / 7v7 Turf</option>
+                  <option>Box Cricket</option>
+                  <option>Tennis Court</option>
+                  <option>Basketball Hardwood</option>
+                  <option>Indoor Badminton</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Player Role</label>
+              <select id="signupRole" class="form-control">
+                <option value="Regular Player">Regular Player / Solo Athlete</option>
+                <option value="Team Captain">Team Captain / Squad Leader</option>
+                <option value="Ground Manager">Ground Manager</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-google" style="width: 100%; margin-top: 0.5rem; background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none;">
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <path fill="#ffffff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#ffffff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#ffffff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#ffffff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>Create Account with Google</span>
+            </button>
+          </form>
+        </div>
+
+        <div style="font-size: 0.78rem; text-align: center; color: var(--text-dim); margin-top: 1.25rem;">
+          Protected by Google Identity & Smart Ground OAuth 2.0.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
